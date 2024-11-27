@@ -4,7 +4,7 @@ const getContractToken = require('./getContract.ts');
 
 config();
 
-async function transfer() {
+async function transferFrom() {
     const tokenAddress = "0xdF261b337F137646d010ae933Ab729fdfFb9f4e4";
     const contract = await getContractToken(tokenAddress);
 
@@ -22,16 +22,12 @@ async function transfer() {
         const signer1Address = await signer1.getAddress();
         const signer2Address = await signer2.getAddress();
 
-        const allowanceAmount = ethers.parseUnits("2", 18);
-
-        const approve_tx = await contract.connect(signer1).approve(signer2Address, allowanceAmount);
-        await approve_tx.wait();
-        console.log(`Approve transaction finished.`);
+        const sendAmount = ethers.parseUnits("2", 18);
         
         const curAllowance = await contract.allowance(signer1Address, signer2Address);
         console.log(`Allowance from ${signer1Address} to ${signer2Address}: ${curAllowance}`); 
 
-        const transferFrom_tx = await contract.connect(signer2).transferFrom(signer1Address, signer2Address, allowanceAmount);
+        const transferFrom_tx = await contract.connect(signer2).transferFrom(signer1Address, signer2Address, sendAmount);
         await transferFrom_tx.wait();
 
         const signer1Balance = await contract.balanceOf(signer1Address);
@@ -46,7 +42,7 @@ async function transfer() {
     }
 }
 
-transfer()
+transferFrom()
     .then(() => process.exit(0))
     .catch((error) => {
         console.error(error);
